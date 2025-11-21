@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Distansia — Profil</title>
+  <style>
+    body{font-family:Inter,Segoe UI,Arial,sans-serif;background:#f8fafc;color:#0f172a;margin:0;padding:0}
+    header{background:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(2,6,23,0.06)}
+    .brand{display:flex;align-items:center;gap:10px}
+    .logo{width:40px;height:40px}
+    main{max-width:1100px;margin:28px auto;padding:0 18px}
+    .profile{display:flex;gap:20px;align-items:center}
+    .avatar{width:84px;height:84px;border-radius:12px;background:linear-gradient(180deg,#eef2ff,#fff);display:flex;align-items:center;justify-content:center;font-weight:700;color:#4f46e5}
+    .profile h1{margin:0;font-size:20px}
+    .profile p{margin:6px 0 0;color:#6b7280}
+
+    .grid{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-top:20px}
+    .card{background:#fff;padding:16px;border-radius:12px;box-shadow:0 6px 20px rgba(15,23,42,0.04);border:1px solid rgba(2,6,23,0.04)}
+
+    .courses-list{display:grid;gap:12px}
+    .course{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:8px;border:1px solid #eef2ff}
+    .course-title{font-weight:600}
+    .course-actions button{padding:8px 10px;border-radius:8px;border:none;cursor:pointer}
+    .btn-enroll{background:#4f46e5;color:#fff}
+    .btn-unenroll{background:#fff;border:1px solid #e5e7eb;color:#111}
+
+    .sidebar h3{margin-top:0}
+    .small{font-size:13px;color:#6b7280}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="#4f46e5"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs><rect width="48" height="48" rx="10" fill="url(#g2)"/><text x="50%" y="54%" text-anchor="middle" font-size="20" font-family="Arial" fill="#fff" font-weight="700">D</text></svg>
+      <div>
+        <div style="font-weight:700">Distansia</div>
+        <div style="font-size:13px;color:#6b7280">Onlayn akademiya</div>
+      </div>
+    </div>
+    <div>
+      <span id="headerUser" style="margin-right:14px;font-weight:600;color:#4f46e5"></span>
+      <a href="#" id="logout" style="color:#e11d48;text-decoration:none">Chiqish</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="profile card">
+      <div class="avatar" id="avatar">W</div>
+      <div>
+        <h1 id="profileName">Foydalanuvchi</h1>
+        <p id="profileEmail">email@example.com</p>
+        <p id="profileExtra" style="margin-top:8px;color:#6b7280"></p>
+      </div>
+    </section>
+
+    <div class="grid">
+      <div>
+        <div class="card">
+          <h3>Sizning kurslaringiz</h3>
+          <div id="enrolledList" class="courses-list" style="margin-top:12px">
+            <!-- enrolled courses appear here -->
+          </div>
+          <div id="noEnrolled" class="small" style="margin-top:10px; display:none">Siz hozircha hech qanday kursga yozilmagansiz.</div>
+        </div>
+
+        <div class="card" style="margin-top:14px">
+          <h3>Mavjud kurslar</h3>
+          <div id="availableList" class="courses-list" style="margin-top:12px">
+            <!-- available courses here -->
+          </div>
+        </div>
+      </div>
+
+      <aside class="sidebar">
+        <div class="card">
+          <h3>Tez ma'lumot</h3>
+          <p class="small">Bu profil sahifa demo: foydalanuvchi va kurs ma'lumotlari faqat brauzerning localStorage'ida saqlanadi.</p>
+          <div style="margin-top:10px">
+            <button id="goHome" style="padding:8px 12px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;cursor:pointer">Bosh sahifaga qaytish</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Payment modal -->
+  <div id="paymentModal" style="display:none; position:fixed; inset:0; align-items:center; justify-content:center; background:rgba(0,0,0,0.5); z-index:2000;">
+    <div style="background:#fff; padding:18px; border-radius:10px; width:420px; max-width:92%; box-shadow:0 8px 40px rgba(2,6,23,0.2);">
+      <h3 id="payTitle">To'lov</h3>
+      <p id="payDesc" style="color:#374151; margin-bottom:10px">Kurs uchun to'lovni tasdiqlang</p>
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <input id="cardName" placeholder="Karta egasi (ism)" style="flex:1;padding:10px;border-radius:8px;border:1px solid #e6e9f2" />
+      </div>
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <input id="cardNumber" placeholder="Kart raqami (xxxx xxxx xxxx xxxx)" style="flex:1;padding:10px;border-radius:8px;border:1px solid #e6e9f2" />
+      </div>
+      <div style="display:flex; gap:8px; margin-bottom:12px;">
+        <input id="cardExp" placeholder="MM/YY" style="padding:10px;border-radius:8px;border:1px solid #e6e9f2;width:110px" />
+        <input id="cardCvc" placeholder="CVC" style="padding:10px;border-radius:8px;border:1px solid #e6e9f2;width:110px" />
+      </div>
+      <div style="display:flex; gap:8px; justify-content:flex-end;">
+        <button id="payCancel" style="padding:10px 12px;border-radius:8px;border:1px solid #e5e7eb;background:#fff;cursor:pointer">Bekor qilish</button>
+        <button id="payConfirm" style="padding:10px 12px;border-radius:8px;border:none;background:#4f46e5;color:#fff;cursor:pointer">To'lash</button>
+      </div>
+      <p id="payMsg" style="margin-top:10px; color:#b91c1c"></p>
+    </div>
+  </div>
+
+<script>
+// Profile page JS: load current user and enrollments, show courses, allow enroll/unenroll
+const CURR_KEY = 'distansia_currentUser';
+const ENROLL_KEY = 'distansia_enrollments';
+const USERS_KEY = 'distansia_users';
+
+function getCurrentUser(){ try{return JSON.parse(localStorage.getItem(CURR_KEY)); }catch(e){ return null; } }
+function getEnrollments(){ try{return JSON.parse(localStorage.getItem(ENROLL_KEY)) || {}; }catch(e){ return {}; } }
+function saveEnrollments(obj){ localStorage.setItem(ENROLL_KEY, JSON.stringify(obj)); }
+
+// Example course data
+const COURSES = [
+  { id: 'eng-a1', title: 'Ingliz tili - A1 Poydevor', price: '249 000 UZS' },
+  { id: 'arab-a1', title: 'Arab tili - A1 Poydevor', price: '259 000 UZS' },
+  { id: 'arab-pro', title: 'Arabic Pro - 1 oy', price: '499 000 UZS' },
+  { id: 'math-basics', title: 'Matematika - Boshlang\'ich', price: '199 000 UZS' },
+  // Full courses (To'liq kurslar)
+  { id: 'eng-6m', title: 'Ingliz tili (6 oy) — To\'liq kurs', price: '120 $' },
+  { id: 'arab-10m', title: 'Arab tili (10 oy) — To\'liq kurs', price: '199 $' }
+];
+
+// If the page was opened with a ?course=... param and user is not logged in,
+// save the requested course to localStorage so auth can redirect back and open payment.
+const urlParams = new URLSearchParams(window.location.search);
+const requestedCourse = urlParams.get('course');
+const user = getCurrentUser();
+if(!user){ // not logged in -> redirect to auth
+  if(requestedCourse) localStorage.setItem('distansia_pending_course', requestedCourse);
+  window.location.href = 'auth.html';
+}
+
+// render header and profile
+document.getElementById('headerUser').textContent = user.name || user.email;
+document.getElementById('profileName').textContent = user.name || user.email;
+document.getElementById('profileEmail').textContent = user.email || '';
+// compute initials from first and last name when available
+const initials = ((user.firstName ? user.firstName[0] : '') + (user.lastName ? user.lastName[0] : '')).trim();
+document.getElementById('avatar').textContent = (initials || (user.name || user.email || 'D')[0]).toUpperCase();
+// show extra details: age, phone, address
+const extras = [];
+if(user.age) extras.push('Yosh: ' + user.age);
+if(user.phone) extras.push('Telefon: ' + user.phone);
+if(user.address) extras.push('Manzil: ' + user.address);
+document.getElementById('profileExtra').textContent = extras.join(' • ');
+
+const enrolledList = document.getElementById('enrolledList');
+const availableList = document.getElementById('availableList');
+const noEnrolled = document.getElementById('noEnrolled');
+
+function render(){
+  const enrollments = getEnrollments();
+  const my = enrollments[user.email] || [];
+  enrolledList.innerHTML = '';
+  availableList.innerHTML = '';
+
+  if(my.length === 0){ noEnrolled.style.display = 'block'; } else { noEnrolled.style.display='none'; }
+
+  // Enrolled
+  my.forEach(cid => {
+    const c = COURSES.find(x=>x.id===cid);
+    if(!c) return;
+    const el = document.createElement('div'); el.className='course';
+    el.innerHTML = `<div><div class="course-title">${c.title}</div><div class="small">${c.price}</div></div><div class="course-actions"><button class="btn-unenroll" data-id="${c.id}">Chiqish</button></div>`;
+    enrolledList.appendChild(el);
+  });
+
+  // Available (show those not enrolled)
+  COURSES.forEach(c => {
+    const enrolled = my.includes(c.id);
+    const el = document.createElement('div'); el.className='course';
+    el.innerHTML = `<div><div class="course-title">${c.title}</div><div class="small">${c.price}</div></div><div class="course-actions">${enrolled? '<span class="small">Siz yozilgansiz</span>' : `<button class="btn-enroll" data-id="${c.id}">Yozilish</button>`}</div>`;
+    availableList.appendChild(el);
+  });
+}
+
+// Payment + Click handlers
+const PAYMENT_KEY = 'distansia_payments';
+function getPayments(){ try{return JSON.parse(localStorage.getItem(PAYMENT_KEY)) || {}; }catch(e){ return {}; } }
+function savePayments(obj){ localStorage.setItem(PAYMENT_KEY, JSON.stringify(obj)); }
+
+// payment modal elements
+const paymentModal = document.getElementById('paymentModal');
+const payTitle = document.getElementById('payTitle');
+const payDesc = document.getElementById('payDesc');
+const payMsg = document.getElementById('payMsg');
+const payCancel = document.getElementById('payCancel');
+const payConfirm = document.getElementById('payConfirm');
+let _selectedCourse = null;
+
+function openPaymentModal(courseId){
+  const course = COURSES.find(c=>c.id===courseId);
+  if(!course) return;
+  _selectedCourse = courseId;
+  payTitle.textContent = `To'lov — ${course.title}`;
+  payDesc.textContent = `Jami: ${course.price}. Iltimos, to'lov ma'lumotlarini kiriting (demo).`;
+  payMsg.textContent = '';
+  // clear inputs
+  document.getElementById('cardName').value = user.name || '';
+  document.getElementById('cardNumber').value = '';
+  document.getElementById('cardExp').value = '';
+  document.getElementById('cardCvc').value = '';
+  paymentModal.style.display = 'flex';
+}
+
+function closePaymentModal(){ paymentModal.style.display = 'none'; _selectedCourse = null; }
+
+payCancel.addEventListener('click', ()=>{ closePaymentModal(); });
+
+payConfirm.addEventListener('click', ()=>{
+  payMsg.style.color = '#b91c1c';
+  const name = document.getElementById('cardName').value.trim();
+  const number = document.getElementById('cardNumber').value.replace(/\D+/g,'');
+  const exp = document.getElementById('cardExp').value.trim();
+  const cvc = document.getElementById('cardCvc').value.trim();
+  // require 16-digit card number and a 3-4 digit CVC
+  if(!name || !number || number.length !== 16 || !exp || !(cvc.length === 3 || cvc.length === 4)){
+    payMsg.textContent = 'Iltimos, haqiqiy toʻlov maʼlumotlarini kiriting (16 xonali karta va CVC).'; return;
+  }
+  // simulate processing
+  payMsg.style.color = '#374151'; payMsg.textContent = 'Toʻlov amalga oshirilmoqda...';
+  payConfirm.disabled = true; payCancel.disabled = true;
+  setTimeout(()=>{
+    // simulate success
+    const payments = getPayments();
+    payments[user.email] = payments[user.email] || [];
+    payments[user.email].push({ courseId: _selectedCourse, amount: COURSES.find(c=>c.id===_selectedCourse).price, time: Date.now() });
+    savePayments(payments);
+    // enroll after payment
+    const enrollments = getEnrollments();
+    enrollments[user.email] = enrollments[user.email] || [];
+    if(!enrollments[user.email].includes(_selectedCourse)) enrollments[user.email].push(_selectedCourse);
+    saveEnrollments(enrollments);
+    payMsg.style.color = '#0f5132'; payMsg.textContent = 'Toʻlov muvaffaqiyatli amalga oshirildi — kursga yozildingiz.';
+    payConfirm.disabled = false; payCancel.disabled = false;
+    setTimeout(()=>{ closePaymentModal(); render(); }, 900);
+  }, 900);
+});
+
+// click handlers for lists
+availableList.addEventListener('click', (e)=>{
+  const btn = e.target.closest('button'); if(!btn) return;
+  if(btn.classList.contains('btn-enroll')){
+    const cid = btn.getAttribute('data-id');
+    // open payment modal instead of direct enroll
+    openPaymentModal(cid);
+  }
+});
+
+enrolledList.addEventListener('click', (e)=>{
+  const btn = e.target.closest('button'); if(!btn) return;
+  if(btn.classList.contains('btn-unenroll')){
+    const cid = btn.getAttribute('data-id');
+    const enrollments = getEnrollments();
+    enrollments[user.email] = (enrollments[user.email] || []).filter(x=>x!==cid);
+    saveEnrollments(enrollments);
+    // optionally remove payment record (we keep payment history but you can add refund logic here)
+    render();
+  }
+});
+
+// logout and navigation
+document.getElementById('logout').addEventListener('click', (e)=>{ e.preventDefault(); localStorage.removeItem(CURR_KEY); window.location.href = 'index.html'; });
+
+document.getElementById('goHome').addEventListener('click', ()=>{ window.location.href = 'index.html'; });
+
+render();
+
+// If there was a pending course requested before auth, open payment now
+const pendingCourse = localStorage.getItem('distansia_pending_course');
+if(pendingCourse){
+  localStorage.removeItem('distansia_pending_course');
+  // ensure the course exists
+  if(COURSES.find(c=>c.id===pendingCourse)){
+    // small delay to let UI render
+    setTimeout(()=> openPaymentModal(pendingCourse), 200);
+  }
+}
+</script>
+</body>
+</html>

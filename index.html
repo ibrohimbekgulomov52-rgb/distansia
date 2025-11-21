@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Distansia O'quv Markazi</title>
+  <style>
+    body { margin:0; font-family:Arial, sans-serif; background:#f5f5f5; color:#222; }
+    header { background:#fff; box-shadow:0 2px 5px rgba(0,0,0,0.1); padding:15px 30px; position:sticky; top:0; z-index:100; }
+    nav a { margin-right:20px; text-decoration:none; color:#444; font-size:14px; }
+    nav a:hover { color:#4f46e5; }
+
+    /* Logo / site title styling: keep the image small and aligned with text */
+    .site-title { display:flex; align-items:center; gap:10px; font-size:1.25rem; }
+    .site-title .logo { width:56px; height:auto; display:block; object-fit:contain; }
+
+    .hero { background:linear-gradient(120deg,#4f46e5,#7c3aed); padding:70px 30px; color:#fff; }
+    .container { max-width:1100px; margin:auto; }
+
+    .btn { padding:10px 18px; border-radius:10px; text-decoration:none; display:inline-block; }
+    .btn-white { background:#fff; color:#4f46e5; }
+    .btn-outline { border:2px solid #fff; color:#fff; }
+
+    .section { padding:60px 30px; }
+    .courses { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; }
+    .card { background:#fff; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+  /* clickable course cards (open course details) */
+  .card[data-id]{ cursor:pointer; }
+  .card[data-id]:hover{ transform:translateY(-4px); transition:transform 0.15s ease; }
+    .price { color:#4f46e5; font-weight:bold; }
+
+    .contact-box { background:#fff; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+    input, textarea { width:100%; padding:10px; margin:6px 0; border:1px solid #ccc; border-radius:6px; }
+    button { padding:10px 16px; background:#4f46e5; color:#fff; border:none; border-radius:6px; cursor:pointer; }
+    button:hover { opacity:0.9; }
+
+    footer { background:#111; color:#bbb; padding:40px 30px; margin-top:40px; }
+    .socials{display:flex;gap:10px;align-items:center}
+    .socials a{display:inline-flex;width:40px;height:40px;align-items:center;justify-content:center;border-radius:8px;background:#fff;color:#111;text-decoration:none}
+    .socials a svg{width:20px;height:20px}
+    .socials a:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(2,6,23,0.16);transition:all .12s}
+  /* --- Team (Ustozlar) --- */
+  .team { padding:40px 0; }
+  .team-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; margin-top:18px; }
+  .teacher { background:#fff; padding:18px; border-radius:12px; text-align:center; box-shadow:0 4px 14px rgba(2,6,23,0.06); }
+  .teacher .avatar { width:84px; height:84px; margin:0 auto 12px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; font-size:22px; background:linear-gradient(135deg,#4f46e5,#7c3aed); }
+  .teacher h4 { margin:6px 0 4px; font-size:16px; }
+  .teacher p.role { margin:0; color:#6b7280; font-size:13px; }
+  .teacher p.bio { margin-top:10px; font-size:14px; color:#374151; }
+  /* --- Auth modal --- */
+  .modal { position:fixed; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.5); visibility:hidden; opacity:0; transition:0.15s; }
+  .modal.show { visibility:visible; opacity:1; }
+  .modal-content { background:white; padding:20px; border-radius:8px; width:360px; max-width:90%; }
+  .modal-content h3 { margin-bottom:12px; }
+  .modal-content input { width:100%; padding:10px; margin:8px 0; border:1px solid #ccc; border-radius:6px; }
+  .modal-actions { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .modal-close { background:transparent; border:none; font-size:18px; cursor:pointer; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="container" style="display:flex; justify-content:space-between; align-items:center;">
+    <div class="site-title" style="display:flex; align-items:center; gap:10px;">
+      <img src="photo_2025-11-19_06-19-36.jpg" alt="DISTANSIA Logo" class="logo">
+      <span style="font-size:1.45rem; font-weight:700;">Distansia</span>
+    </div>
+    <nav>
+      <a href="#courses">Kurslar</a>
+      <a href="#about">Biz haqimizda</a>
+      <a href="#pricing">Narxlar</a>
+      <a href="#contact">Bog'lanish</a>
+      <a href="#team">Ustozlar</a>
+  <!-- Auth link (single "Kirish" navigates to auth page). When logged in the name links to profile. -->
+  <a href="auth.html" id="signinLink">Kirish</a>
+      <span id="profileArea" style="display:none; margin-left:12px;">
+        <a href="profile.html" id="profileName" style="font-weight:600; color:#4f46e5; text-decoration:none;"></a>
+        <a href="#" id="logout" style="margin-left:10px; color:#e11d48;">Chiqish</a>
+      </span>
+    </nav>
+  </div>
+</header>
+
+<!-- Quick header sync: show profile name if user is already logged in (runs immediately) -->
+<script>
+  (function(){
+    try{
+      const user = JSON.parse(localStorage.getItem('distansia_currentUser')||'null');
+      const signinEl = document.getElementById('signinLink');
+      const profileAreaEl = document.getElementById('profileArea');
+      const profileNameEl = document.getElementById('profileName');
+      if(user){ if(signinEl) signinEl.style.display='none'; if(profileAreaEl) profileAreaEl.style.display='inline-block'; if(profileNameEl){ profileNameEl.textContent = user.name || user.email; profileNameEl.href='profile.html'; } }
+      else { if(signinEl) signinEl.style.display='inline-block'; if(profileAreaEl) profileAreaEl.style.display='none'; }
+    }catch(e){ /* ignore */ }
+  })();
+</script>
+
+<section class="hero">
+  <div class="container">
+    <h1 style="font-size:34px; font-weight:bold;">Distansia — Masofadan yuksaling(ishga tushirilmagan)</h1>
+    <p style="max-width:550px; margin-top:10px; opacity:0.9;">
+      Onlayn ta'lim: Ingliz tili, Arab tili, Rus tili, IELTS, Multilevel, SAT, matematika. Malakali ustozlar, qulay jadval.
+    </p>
+
+    <div style="margin-top:25px;">
+      <a href="#courses" class="btn btn-white">Kurslarni ko'rish</a>
+      <a href="auth.html" class="btn btn-outline" style="margin-left:10px;">Kirish</a>
+    </div>
+  </div>
+</section>
+
+<section id="courses" class="section">
+  <div class="container">
+  <h2>Kurslar</h2>
+  <h3 style="margin-top:10px;color:#374151;font-weight:600;">Mashxur kurslar</h3>
+    <div class="courses" style="margin-top:20px;">
+
+      <div class="card" data-id="eng-a1">
+        <h3>Ingliz tili darajaviy</h3>
+        <p>A1 - Poydevor kursi</p>
+        <p class="price">249 000 UZS</p>
+      </div>
+
+      <div class="card" data-id="arab-a1">
+        <h3>Arab tili darajaviy</h3>
+        <p>A1 - Poydevor kursi</p>
+        <p class="price">259 000 UZS</p>
+      </div>
+    
+      <div class="card" data-id="IELTS+">
+        <h3>IELTS+</h3>
+        <p>IELTS imtihoniga tayyorlov kursi</p>
+        <p class="price">399 000 UZS</p>
+      </div>
+
+      <div class="card" data-id="arab-pro">
+        <h3>Arabic pro</h3>
+        <p>1 oyda Arab tilida mukammal mutolaa va tarjima qilishni boshlaysiz</p>
+        <p class="price">499 000 UZS</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="about" class="section" style="background:#fff;">
+  <div class="container">
+    <h2>Biz haqimizda</h2>
+    <p style="max-width:700px; margin-top:10px;">
+      Distansia — masofaviy sifatli ta'lim beruvchi to'laqonli online o'quv markazi bo'lib, bizda eng arzon kurslarni topishingiz va yuksalishingiz mumkin. Biz bilan ilm oling
+    </p>
+  </div>
+</section>
+
+<!-- Ustozlar (team) -->
+<section id="team" class="section team" style="background:#f9fafb;">
+  <div class="container">
+    <h2>Ustozlarimiz</h2>
+    <p style="max-width:700px; margin-top:6px; color:#6b7280;">Bizning tajribali ustozlarimiz sizni har bir bosqichda qo'llab-quvvatlaydi. Har biri o'z sohasida yetakchi va amaliy tajribaga ega.</p>
+
+    <div class="team-grid">
+      <div class="teacher">
+        <div class="avatar">J</div>
+        <h4>Mr.Jones</h4>
+        <p class="role">English teacher</p>
+        <p class="bio">Umumiy ingliz tili va Multilevel bo'yicha 12 yillik tajriba. 1000dan ziyod o'quvchilar. Kurslar interaktiv va natijaga yo'naltirilgan.</p>
+      </div>
+
+      <div class="teacher">
+        <div class="avatar">Z</div>
+        <h4>Mrs.Zukhra</h4>
+        <p class="role">English teacher</p>
+        <p class="bio">Ingliz tili bo'yicha 5 yillik tajriba. Yuqori natijalar va ustozlik mahorati.</p>
+      </div>
+
+      <div class="teacher">
+        <div class="avatar">BU</div>
+        <h4>Behruz ustoz</h4>
+        <p class="role">Arab tili mutaxassisi</p>
+        <p class="bio">Arab tili bo'yicha 4 yillik tajriba. Qisqa muddatda natijalarga yo'naltirilgan darslar</p>
+      </div>
+
+      <div class="teacher">
+        <div class="avatar">I</div>
+        <h4>Ibrohimbek</h4>
+        <p class="role">Multiteacher</p>
+        <p class="bio">Ingliz va Arab tillarini mukammal o'rgatuvchi ko'p qirrali ustozlardan</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="pricing" class="section">
+  <div class="container">
+    <h2>To'liq kurslar</h2>
+    <div class="courses" style="margin-top:20px;">
+      <div class="card" data-id="eng-6m"><h3>Ingliz tili (6oy) — 120$</h3></div>
+      <div class="card" data-id="arab-10m"><h3>Arab tili (10 oy) — 199$</h3></div>
+      <div class="card" data-id="Turk-3m"><h3>Turk tili (3oy) — 90$</h3></div>
+      <div class="card" data-id="rus-6m"><h3>Rus tili (6oy) — 120$</h3></div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="section" style="background:#fff;">
+  <div class="container" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:30px;">
+
+    <div>
+      <h2>Bog'lanish</h2>
+      <p>Telefon: +998 88 065 11 22</p>
+      <p>Email: info@distansia.uz</p>
+      <p>Manzil: Toshkent, O'zbekiston</p>
+    </div>
+
+    <div class="contact-box">
+      <!-- Contact form using FormSubmit (sends to your email) -->
+      <form id="contactForm" action="https://formsubmit.co/ibrohimbekgulomov52@gmail.com" method="POST">
+        <!-- recommended hidden fields for FormSubmit -->
+        <input type="hidden" name="_subject" value="Murojaat — Distansia saytidan">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="hidden" name="_next" value="index.html?sent=1">
+        <input type="text" name="name" placeholder="Ismingiz" required />
+        <input type="email" name="email" placeholder="Email" required />
+        <textarea name="message" rows="4" placeholder="Xabar" required></textarea>
+        <button type="submit">Yuborish</button>
+        <p id="status" style="margin-top:10px; font-size:14px;"></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+    <div style="color:#bbb">© 2025 Distansia. Barcha huquqlar himoyalangan.</div>
+    <div class="socials" aria-label="Distansia ijtimoiy tarmoqlari">
+      <a href="https://t.me/distansia_uz" target="_blank" rel="noopener" aria-label="Telegram">
+        <!-- Telegram SVG -->
+        <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g fill="none"><circle cx="120" cy="120" r="120" fill="#27AEE1"/><path d="M50 120l120-40-30 120-30-40-60-40z" fill="#fff"/></g></svg>
+      </a>
+      <a href="http://instagram.com/ibn_qobil" target="_blank" rel="noopener" aria-label="Instagram">
+        <!-- Instagram SVG -->
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><linearGradient id="ig" x1="0" x2="1"><stop offset="0" stop-color="#f58529"/><stop offset="0.5" stop-color="#dd2a7b"/><stop offset="1" stop-color="#8134af"/></linearGradient><rect width="24" height="24" rx="5" fill="url(#ig)"/><path d="M12 7.2a4.8 4.8 0 1 0 0 9.6 4.8 4.8 0 0 0 0-9.6zm6.4-1.6a1.12 1.12 0 1 1 0 2.24A1.12 1.12 0 0 1 18.4 5.6z" fill="#fff"/></svg>
+      </a>
+      <a href="" target="_blank" rel="noopener" aria-label="YouTube">
+        <!-- YouTube SVG -->
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect width="24" height="24" rx="4" fill="#FF0000"/><path d="M9.5 8.5v7l6-3.5-6-3.5z" fill="#fff"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById("contactForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const name = this.name.value;
+    const email = this.email.value;
+    const msg = this.message.value;
+
+    // mailto orqali yuborish
+    const mail = `mailto:ibrohimbekgulomov52@gmail.com?subject=Murojaat - ${name}&body=Ism: ${name}%0AEmail: ${email}%0AXabar: ${msg}`;
+    window.location.href = mail;
+
+    document.getElementById("status").innerText = "Xabar email orqali yuborilmoqda...";
+  });
+</script>
+<!-- Course detail modal -->
+<div id="courseModal" class="modal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true">
+    <button class="modal-close" id="closeCourseModal">✕</button>
+    <h3 id="courseModalTitle">Kurs</h3>
+    <p id="courseModalDesc" style="color:#374151; margin-top:8px">Kurs haqida batafsil ma'lumot.</p>
+    <p id="courseModalPrice" style="font-weight:700; margin-top:10px; color:#4f46e5"></p>
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px">
+      <a id="buyBtn" class="btn btn-white" href="#">Sotib olish</a>
+      <button id="closeCourseBtn" class="btn btn-outline" type="button">Yopish</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // small in-page course data (mirrors profile's COURSES)
+  const HOMEPAGE_COURSES = {
+    'eng-a1': { title: 'Ingliz tili - A1 Poydevor', desc: 'Boshlang\'ich darajadagi ingliz tili kursi: grammatika, so\'z boyligi va tinglab tushunish.', price: '249 000 UZS' },
+    'arab-a1': { title: 'Arab tili - A1 Poydevor', desc: 'Boshlang\'ich arab tili kursi: asosiy so\'zlar, grammatik tuzilmalar va amaliy mashqlar.', price: '259 000 UZS' },
+    'arab-pro': { title: 'Arabic Pro', desc: 'Intensiv kurs: 1 oy ichida real hayotiy muloqot va tarjima ko\'nikmalarini oshiring.', price: '499 000 UZS' },
+    'eng-6m': { title: "Ingliz tili (6 oy) — To'liq kurs", desc: "To'liq 6 oylik kurs: modullar, testlar va sertifikat.", price: '120 $' },
+    'arab-10m': { title: "Arab tili (10 oy) — To'liq kurs", desc: "10 oylik kengaytirilgan o'quv dasturi va amaliy mashg'ulotlar.", price: '199 $' }
+  };
+
+  const courseModal = document.getElementById('courseModal');
+  const courseModalTitle = document.getElementById('courseModalTitle');
+  const courseModalDesc = document.getElementById('courseModalDesc');
+  const courseModalPrice = document.getElementById('courseModalPrice');
+  const buyBtn = document.getElementById('buyBtn');
+  const closeCourseModalBtn = document.getElementById('closeCourseBtn');
+  const closeCourseModalX = document.getElementById('closeCourseModal');
+
+  function showCourseModal(id){
+    const c = HOMEPAGE_COURSES[id];
+    if(!c) return;
+    courseModalTitle.textContent = c.title;
+    courseModalDesc.textContent = c.desc;
+    courseModalPrice.textContent = c.price;
+    // when buy is clicked, open payment methods chooser
+    buyBtn.href = '#';
+    buyBtn.onclick = (e)=>{ e.preventDefault(); openPaymentMethods(id); };
+    courseModal.classList.add('show');
+  }
+  function hideCourseModal(){ courseModal.classList.remove('show'); }
+
+  document.querySelectorAll('.card[data-id]').forEach(card => {
+    card.addEventListener('click', ()=>{
+      const id = card.getAttribute('data-id');
+      showCourseModal(id);
+    });
+  });
+
+  closeCourseModalBtn.addEventListener('click', hideCourseModal);
+  closeCourseModalX.addEventListener('click', hideCourseModal);
+  // allow clicking backdrop to close
+  courseModal.addEventListener('click', (e)=>{ if(e.target === courseModal) hideCourseModal(); });
+</script>
+
+<!-- Payment methods modal (homepage) -->
+<div id="paymentMethodsModal" class="modal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true">
+    <button class="modal-close" id="pmClose">✕</button>
+    <h3>To'lov usullari</h3>
+    <p style="margin-top:8px;color:#374151">Quyidagi usullardan birini tanlang:</p>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">
+      <button id="pmCard" class="btn btn-white">Karta orqali (tez)</button>
+      <button id="pmPaypal" class="btn btn-outline">PayPal orqali</button>
+      <button id="pmProfile" class="btn btn-outline">To'lovni profil orqali davom ettirish</button>
+    </div>
+  </div>
+</div>
+
+<!-- Inline card payment modal (homepage quick-pay demo) -->
+<div id="cardPayModal" class="modal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true">
+    <button class="modal-close" id="cardClose">✕</button>
+    <h3 id="cardPayTitle">Karta orqali to'lov</h3>
+    <p id="cardPayDesc" style="color:#374151;margin-top:8px">Karta ma'lumotlarini kiriting (demo).</p>
+    <input id="pm_cardName" placeholder="Karta egasi" />
+    <input id="pm_cardNumber" placeholder="4242 4242 4242 4242" />
+    <div style="display:flex; gap:8px"><input id="pm_cardExp" placeholder="MM/YY" style="flex:1" /><input id="pm_cardCvc" placeholder="CVC" style="width:120px" /></div>
+    <p id="pm_cardMsg" style="color:#b91c1c; margin-top:8px"></p>
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px">
+      <button id="pm_cardCancel" class="btn btn-outline">Bekor qilish</button>
+      <button id="pm_cardConfirm" class="btn btn-white">To'lash</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Helpers for localStorage usage (mirror keys used in profile)
+  function _getJSON(k){ try{return JSON.parse(localStorage.getItem(k)); }catch(e){return null;} }
+  function _setJSON(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
+  const CURR_KEY = 'distansia_currentUser';
+  const ENROLL_KEY = 'distansia_enrollments';
+  const PAYMENT_KEY = 'distansia_payments';
+
+  const pmModal = document.getElementById('paymentMethodsModal');
+  const pmClose = document.getElementById('pmClose');
+  const pmCard = document.getElementById('pmCard');
+  const pmPaypal = document.getElementById('pmPaypal');
+  const pmProfile = document.getElementById('pmProfile');
+  let _pm_selectedCourse = null;
+
+  function openPaymentMethods(courseId){
+    const user = _getJSON(CURR_KEY);
+    if(!user){ // require login first
+      localStorage.setItem('distansia_pending_course', courseId);
+      window.location.href = 'auth.html';
+      return;
+    }
+    _pm_selectedCourse = courseId;
+    pmModal.classList.add('show');
+  }
+  function closePaymentMethods(){ pmModal.classList.remove('show'); _pm_selectedCourse=null; }
+  pmClose.addEventListener('click', closePaymentMethods);
+
+  // Pay with card (inline)
+  const cardModal = document.getElementById('cardPayModal');
+  const cardClose = document.getElementById('cardClose');
+  const cardCancel = document.getElementById('pm_cardCancel');
+  const cardConfirm = document.getElementById('pm_cardConfirm');
+  const cardMsg = document.getElementById('pm_cardMsg');
+
+  pmCard.addEventListener('click', ()=>{
+    pmModal.classList.remove('show');
+    const user = _getJSON(CURR_KEY);
+    if(!user){ localStorage.setItem('distansia_pending_course', _pm_selectedCourse); window.location.href='auth.html'; return; }
+    // open card modal
+    document.getElementById('pm_cardName').value = user.name || '';
+    document.getElementById('pm_cardNumber').value = '';
+    document.getElementById('pm_cardExp').value = '';
+    document.getElementById('pm_cardCvc').value = '';
+    cardMsg.textContent = '';
+    cardModal.classList.add('show');
+  });
+
+  // PayPal -> open PayPal site (demo), keep pending course if not logged
+  pmPaypal.addEventListener('click', ()=>{
+    const user = _getJSON(CURR_KEY);
+    if(!user){ localStorage.setItem('distansia_pending_course', _pm_selectedCourse); window.location.href='auth.html'; return; }
+    // open PayPal (demo) in new tab
+    window.open('https://www.paypal.com/', '_blank');
+  });
+
+  // Continue to profile payment
+  pmProfile.addEventListener('click', ()=>{
+    const user = _getJSON(CURR_KEY);
+    if(!user){ localStorage.setItem('distansia_pending_course', _pm_selectedCourse); window.location.href='auth.html'; return; }
+    // redirect to profile payment flow
+    window.location.href = `profile.html?course=${encodeURIComponent(_pm_selectedCourse)}`;
+  });
+
+  function closeCardModal(){ cardModal.classList.remove('show'); }
+  cardClose.addEventListener('click', closeCardModal);
+  cardCancel.addEventListener('click', closeCardModal);
+
+  cardConfirm.addEventListener('click', ()=>{
+    const name = document.getElementById('pm_cardName').value.trim();
+    const number = document.getElementById('pm_cardNumber').value.replace(/\D+/g,'');
+    const exp = document.getElementById('pm_cardExp').value.trim();
+    const cvc = document.getElementById('pm_cardCvc').value.trim();
+    // require exactly 16 digits for card number and 3-4 digits for CVC
+    if(!name || !number || number.length !== 16 || !exp || !(cvc.length === 3 || cvc.length === 4)){
+      cardMsg.textContent = 'Iltimos, toʻlov maʼlumotlarini toʻliq kiriting (16 xonali karta va CVC).'; return;
+    }
+    cardMsg.style.color = '#374151'; cardMsg.textContent = 'Toʻlov amalga oshirilmoqda...';
+    cardConfirm.disabled = true; cardCancel.disabled = true;
+    setTimeout(()=>{
+      // save payment record and enroll
+      const user = _getJSON(CURR_KEY);
+      const payments = _getJSON(PAYMENT_KEY) || {};
+      payments[user.email] = payments[user.email] || [];
+      payments[user.email].push({ courseId: _pm_selectedCourse, amount: HOMEPAGE_COURSES[_pm_selectedCourse].price, time: Date.now() });
+      _setJSON(PAYMENT_KEY, payments);
+      const enroll = _getJSON(ENROLL_KEY) || {};
+      enroll[user.email] = enroll[user.email] || [];
+      if(!enroll[user.email].includes(_pm_selectedCourse)) enroll[user.email].push(_pm_selectedCourse);
+      _setJSON(ENROLL_KEY, enroll);
+      cardMsg.style.color = '#0f5132'; cardMsg.textContent = 'Toʻlov muvaffaqiyatli. Siz kursga yozildingiz.';
+      cardConfirm.disabled = false; cardCancel.disabled = false;
+      setTimeout(()=>{ closeCardModal(); closePaymentMethods(); }, 900);
+    }, 900);
+  });
+
+  // clicking outside modals closes them
+  pmModal.addEventListener('click', (e)=>{ if(e.target === pmModal) closePaymentMethods(); });
+  cardModal.addEventListener('click', (e)=>{ if(e.target === cardModal) closeCardModal(); });
+</script>
+<script src="script.js"></script>
+
+<!-- Auth modal (hidden by default) -->
+<div id="authModal" class="modal" aria-hidden="true">
+  <div class="modal-content" role="dialog" aria-modal="true">
+    <button class="modal-close" id="modalClose">✕</button>
+    <div id="authForms">
+      <!-- Login form -->
+      <form id="loginForm" style="display:block;">
+        <h3>Kirish</h3>
+        <input type="email" id="loginEmail" placeholder="Email" required />
+        <input type="password" id="loginPassword" placeholder="Parol" required />
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-white">Kirish</button>
+          <button type="button" id="showRegister" class="btn btn-outline">Ro'yxatdan o'tish</button>
+        </div>
+        <p id="authMsg" style="margin-top:8px; color:#b91c1c;"></p>
+      </form>
+
+      <!-- Register form -->
+      <form id="registerForm" style="display:none;">
+        <h3>Ro'yxatdan o'tish</h3>
+        <input type="text" id="regName" placeholder="Ism" required />
+        <input type="email" id="regEmail" placeholder="Email" required />
+        <input type="password" id="regPassword" placeholder="Parol" required />
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-white">Ro'yxatdan o'tish</button>
+          <button type="button" id="showLogin" class="btn btn-outline">Kirishga o'tish</button>
+        </div>
+        <p id="regMsg" style="margin-top:8px; color:#065f46;"></p>
+      </form>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

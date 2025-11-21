@@ -1,0 +1,141 @@
+/* --- Global styles --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+}
+
+body {
+    background: #f8f9fa;
+    color: #222;
+}
+
+/* --- Navbar --- */
+.site-title {
+  display: flex;
+  align-items: flex-start; /* Logo yuqorida turadi */
+  gap: 8px; /* Logo va matn orasidagi masofa */
+  font-size: 1rem; /* Matn hajmi */
+}
+
+.logo {
+  width: 10px;  /* Kichikroq logo */
+  height: auto;
+  margin-top: 4px; /* Matnga biroz yuqoriga ko‘taring (agar kerak bo‘lsa) */
+}
+
+nav {
+    width: 100%;
+    background: #1a73e8;
+    padding: 15px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+nav .logo {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+
+nav ul {
+    display: flex;
+    gap: 25px;
+    list-style: none;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+nav ul li a:hover {
+    color: #cce2ff;
+}
+
+/* --- Hero section --- */
+.hero {
+    height: 85vh;
+    display: flex;
+    align-items: center;
+    padding: 0 8%;
+    background: linear-gradient(to right, #1a73e8, #5aa2ff);
+    color: white;
+}
+
+.hero h1 {
+    font-size: 60px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.hero p {
+    font-size: 20px;
+    margin: 15px 0;
+    width: 60%;
+}
+
+.hero button {
+    padding: 12px 28px;
+    border: none;
+    background: white;
+    color: #1a73e8;
+    font-size: 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.hero button:hover {
+    background: #e8e8e8;
+}
+
+/* --- Courses section --- */
+.courses {
+    padding: 70px 8%;
+    text-align: center;
+}
+
+.courses h2 {
+    font-size: 36px;
+    margin-bottom: 40px;
+}
+
+.course-boxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 25px;
+}
+
+.course {
+    padding: 25px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: 0.3s;
+}
+
+.course:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.course h3 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+/* --- Footer --- */
+footer {
+    background: #1a73e8;
+    padding: 20px 10%;
+    text-align: center;
+    color: white;
+    margin-top: 50px;
+}
